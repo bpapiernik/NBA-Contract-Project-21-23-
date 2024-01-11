@@ -1,0 +1,1649 @@
+---
+title: "Untitled"
+author: "Brian Papiernik"
+date: "2023-11-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 
+
+```{r}
+devtools::install_github("abresler/nbastatR")
+
+```
+
+```{r}
+library(nbastatR)
+```
+
+```{r}
+# install.packages("randomForest")
+# install.packages("rpart")
+# install.packages("caret")
+library(randomForest) # Load randomForest package to run bagging
+library(rpart) # Load rpart for decision trees
+library(caret) # Used for analysing results
+#install.packages("splitstackshape")
+library(splitstackshape) # Used for stratified sampling
+#install.packages("xgboost")
+#install.packages("caret")
+#install.packages("ggplot2")
+#library(devtools) 
+#install.packages("githubinstall")
+library(devtools)
+#install_github("AppliedDataSciencePartners/xgboostExplainer")
+#install.packages("SHAPforxgboost")
+#install.packages("GGally")
+#install.packages("gh")
+
+library(xgboost) # Load XGBoost
+library(caret) # Load Caret
+library(ggplot2) # Load ggplot2
+library(pROC) # Load proc
+library(SHAPforxgboost) # Load shap for XGBoost
+library(caTools)
+library(dplyr)
+library(GGally)
+library(ggplot2) # Load ggplot2
+library(pROC) # Load proc
+library(data.table)
+library(gh)
+library(commonmark)
+library(xgboostExplainer)
+library(dplyr)
+```
+
+
+```{r}
+raptor_stats <- read.csv("2023RaptorPlayer.csv")
+contract_stats <- read.csv("NBAcontracts.csv")
+histraptor_stats <- read.csv("NBAhistcontracts.csv")
+contract_stats2023 <- read.csv("playercontracts2023.csv")
+contract_stats2022 <- read.csv("playercontracts2022.csv")
+```
+
+```{r}
+raptor_stats2022 <- histraptor_stats %>%
+  filter(season == 2022)
+
+raptor_stats2021 <- histraptor_stats %>%
+  filter(season == 2021)
+```
+
+
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result <- teams_players_stats(
+  seasons = 2023,
+  types = "player",
+  tables = c("defense","general"),
+  season_types = "Regular Season",
+  measures = c("Base"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result)
+
+
+# Print the result for all players
+print(result$dataTable)
+
+```
+
+
+```{r}
+trad_stats <- dataGeneralPlayers
+```
+
+```{r}
+def_stats <- dataDefensePlayers
+```
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result2022 <- teams_players_stats(
+  seasons = 2022,
+  types = "player",
+  tables = c("defense","general"),
+  season_types = "Regular Season",
+  measures = c("Base"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result2022)
+
+
+# Print the result for all players
+print(result2022$dataTable)
+
+```
+
+```{r}
+trad_stats2022 <- dataGeneralPlayers
+```
+
+
+```{r}
+def_stats2022 <- dataDefensePlayers
+```
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result2021 <- teams_players_stats(
+  seasons = 2021,
+  types = "player",
+  tables = c("defense","general"),
+  season_types = "Regular Season",
+  measures = c("Base"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result2021)
+
+
+# Print the result for all players
+print(result2021$dataTable)
+
+```
+
+```{r}
+trad_stats2021 <- dataGeneralPlayers
+```
+
+```{r}
+def_stats2021 <- dataDefensePlayers
+```
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result2 <- teams_players_stats(
+  seasons = 2023,
+  types = "player",
+  tables = c("general"),
+  season_types = "Regular Season",
+  measures = c("Advanced"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result2)
+
+
+# Print the result for all players
+print(result2$dataTable)
+```
+```{r}
+adv_stats <- dataGeneralPlayers
+```
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result2.2022 <- teams_players_stats(
+  seasons = 2022,
+  types = "player",
+  tables = c("general"),
+  season_types = "Regular Season",
+  measures = c("Advanced"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result2.2022)
+
+
+# Print the result for all players
+print(result2.2022$dataTable)
+```
+
+```{r}
+adv_stats2022 <- dataGeneralPlayers
+```
+
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result2.2021 <- teams_players_stats(
+  seasons = 2021,
+  types = "player",
+  tables = c("general"),
+  season_types = "Regular Season",
+  measures = c("Advanced"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result2.2021)
+
+
+# Print the result for all players
+print(result2.2021$dataTable)
+```
+
+```{r}
+adv_stats2021 <- dataGeneralPlayers
+```
+
+
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result3 <- teams_players_stats(
+  seasons = 2023,
+  types = "player",
+  tables = c("general"),
+  season_types = "Regular Season",
+  measures = c("Usage"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result3)
+
+
+# Print the result for all players
+print(result3$dataTable)
+```
+
+```{r}
+usage_stats <- dataGeneralPlayers
+```
+
+
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result3.2022 <- teams_players_stats(
+  seasons = 2022,
+  types = "player",
+  tables = c("general"),
+  season_types = "Regular Season",
+  measures = c("Usage"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result3.2022)
+
+
+# Print the result for all players
+print(result3.2022$dataTable)
+```
+
+```{r}
+usage_stats2022 <- dataGeneralPlayers
+```
+
+
+
+```{r}
+# Example: Get year over year data for all players for the 2019 Regular Season
+Sys.setenv(VROOM_CONNECTION_SIZE = 262144)  # Adjust the value as needed
+
+
+# Example: Get defense statistics for all players in the 2018 Regular Season
+result3.2021 <- teams_players_stats(
+  seasons = 2021,
+  types = "player",
+  tables = c("general"),
+  season_types = "Regular Season",
+  measures = c("Usage"),
+  modes = "PerGame",
+  defenses = "Overall",
+  is_plus_minus = FALSE,
+  is_pace_adjusted = FALSE,
+  periods = 0,
+  is_rank = FALSE,
+  game_segments = NA,
+  divisions_against = NA,
+  conferences_against = NA,
+  date_from = NA,
+  date_to = NA,
+  last_n_games = 0,
+  locations = NA,
+  months = 0,
+  season_segments = NA,
+  opponents = NA,
+  countries = NA,
+  weights = NA,
+  outcomes = NA,
+  playoff_rounds = 0,
+  players_experience = NA,
+  players_positions = NA,
+  colleges = NA,
+  draft_picks = NA,
+  draft_years = NA,
+  game_scopes = NA,
+  heights = NA,
+  shot_clock_ranges = NA,
+  clutch_times = NA,
+  ahead_or_behind = "Ahead or Behind",
+  general_ranges = "Overall",
+  dribble_ranges = "0 Dribbles",
+  shot_distance_ranges = "By Zone",
+  touch_time_ranges = NA,
+  closest_defender_ranges = NA,
+  point_diffs = NA,
+  starters_bench = NA,
+  assign_to_environment = TRUE,
+  add_mode_names = TRUE,
+  return_message = TRUE
+)
+
+# Print the result
+print(result3.2021)
+
+
+# Print the result for all players
+print(result3.2021$dataTable)
+```
+
+```{r}
+usage_stats2021 <- dataGeneralPlayers
+```
+
+
+
+```{r}
+library(dplyr)
+
+contract_stats <- contract_stats %>%
+  select(Player, Tm, X2023.24) %>%
+  rename(Team = Tm, 
+         Year_2324 = X2023.24)
+
+contract_stats2022 <- contract_stats2022 %>%
+  select(Player, X2021.22) %>%
+  rename(Year_2122 = X2021.22)
+
+contract_stats2023 <- contract_stats2023 %>%
+  select(Player, X2022.23) %>%
+  rename(Year_2223 = X2022.23)
+```
+
+```{r}
+
+library(stringr)
+
+contract_stats1 <- contract_stats %>%
+  mutate(Year_2324 = sapply(str_extract_all(Year_2324, '[[:digit:]]+'), function(x) as.numeric(paste(x, collapse = ''))))
+
+contract_stats2022.2 <- contract_stats2022 %>%
+  mutate(Year_2122 = sapply(str_extract_all(Year_2122, '[[:digit:]]+'), function(x) as.numeric(paste(x, collapse = ''))))
+
+contract_stats2023.2 <- contract_stats2023 %>%
+  mutate(Year_2223 = sapply(str_extract_all(Year_2223, '[[:digit:]]+'), function(x) as.numeric(paste(x, collapse = ''))))
+
+```
+
+```{r}
+contract_stats1 <- contract_stats1 %>%
+  distinct(Player, .keep_all = TRUE)
+
+contract_stats2022.2 <- contract_stats2022.2 %>%
+  distinct(Player, .keep_all = TRUE)
+
+contract_stats2023.2 <- contract_stats2023.2 %>%
+  distinct(Player, .keep_all = TRUE)
+
+```
+
+
+```{r}
+raptor_stats <- raptor_stats %>%
+  select(-c(war_total,war_playoffs, raptor_box_total, raptor_box_total, raptor_total, predator_total, raptor_onoff_total, player_id))
+
+raptor_stats2021 <- raptor_stats2021 %>%
+  select(-c(war_total,war_playoffs, raptor_box_total, raptor_box_total, raptor_total, predator_total, raptor_onoff_total, player_id))
+
+raptor_stats2022 <- raptor_stats2022 %>%
+  select(-c(war_total,war_playoffs, raptor_box_total, raptor_box_total, raptor_total, predator_total, raptor_onoff_total, player_id))
+
+
+```
+
+```{r}
+def_stats1 <- def_stats %>%
+  select(yearSeason, namePlayer, agePlayer,  gp, slugTeam, idPlayer, idPlayerTeam, fgmDefending, fgaDefending, pctFGDefending, pctFGAvg, diffFGPct)
+
+def_stats1.2022 <- def_stats2022 %>%
+  select(yearSeason, namePlayer, agePlayer,  gp, slugTeam, idPlayer, idPlayerTeam, fgmDefending, fgaDefending, pctFGDefending, pctFGAvg, diffFGPct)
+
+def_stats1.2021 <- def_stats2021 %>%
+  select(yearSeason, namePlayer, agePlayer,  gp, slugTeam, idPlayer, idPlayerTeam, fgmDefending, fgaDefending, pctFGDefending, pctFGAvg, diffFGPct)
+  
+```
+
+```{r}
+usage_stats1 <- usage_stats %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, pctUSG, pctFGMOfTeam, pctFGAOfTeam, pctFG3MOfTeam, pctFG3AOfTeam, pctFTMOfTeam, pctFTAOfTeam, pctOREBOfTeam, pctDREBOfTeam, pctREBOfTeam, pctASTOfTeam, pctTOVOfTeam, pctSTLOfTeam, pctBLKOfTeam, pctBLKAOfTeam, pctPFOfTeam, pctPFDOfTeam, pctPTSOfTeam)
+
+usage_stats1.2022 <- usage_stats2022 %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, pctUSG, pctFGMOfTeam, pctFGAOfTeam, pctFG3MOfTeam, pctFG3AOfTeam, pctFTMOfTeam, pctFTAOfTeam, pctOREBOfTeam, pctDREBOfTeam, pctREBOfTeam, pctASTOfTeam, pctTOVOfTeam, pctSTLOfTeam, pctBLKOfTeam, pctBLKAOfTeam, pctPFOfTeam, pctPFDOfTeam, pctPTSOfTeam)
+
+usage_stats1.2021 <- usage_stats2021 %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, pctUSG, pctFGMOfTeam, pctFGAOfTeam, pctFG3MOfTeam, pctFG3AOfTeam, pctFTMOfTeam, pctFTAOfTeam, pctOREBOfTeam, pctDREBOfTeam, pctREBOfTeam, pctASTOfTeam, pctTOVOfTeam, pctSTLOfTeam, pctBLKOfTeam, pctBLKAOfTeam, pctPFOfTeam, pctPFDOfTeam, pctPTSOfTeam)
+
+```
+
+```{r}
+trad_stats1 <- trad_stats %>% 
+  select(c(1:53))
+
+trad_stats1.2022 <- trad_stats2022 %>% 
+  select(c(1:53))
+
+trad_stats1.2021 <- trad_stats2021 %>% 
+  select(c(1:53))
+```
+
+```{r}
+trad_stats2 <- trad_stats1 %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, fgm, fga, pctFG, fg3m, fg3a, pctFG3, ftm, fta, pctFT, fg2m, fg2a, pctFG2, oreb, dreb, treb, ast, tov, stl, blk, blka, pf, pfd, pts, plusminus, dd2, td3)
+
+trad_stats2.2022 <- trad_stats1.2022 %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, fgm, fga, pctFG, fg3m, fg3a, pctFG3, ftm, fta, pctFT, fg2m, fg2a, pctFG2, oreb, dreb, treb, ast, tov, stl, blk, blka, pf, pfd, pts, plusminus, dd2, td3)
+
+trad_stats2.2021 <- trad_stats1.2021 %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, fgm, fga, pctFG, fg3m, fg3a, pctFG3, ftm, fta, pctFT, fg2m, fg2a, pctFG2, oreb, dreb, treb, ast, tov, stl, blk, blka, pf, pfd, pts, plusminus, dd2, td3)
+```
+
+```{r}
+adv_stats1 <- adv_stats %>%
+  select(c(1:64))
+
+adv_stats1.2022 <- adv_stats2022 %>%
+  select(c(1:64))
+
+adv_stats1.2021 <- adv_stats2021 %>%
+  select(c(1:64))
+```
+
+```{r}
+adv_stats2 <- adv_stats1 %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, possessions, pctAST, pctOREB, pctDREB, pctTREB, pctTOVTeam, pctTOVE, pctEFG, pctTS, pctUSG, pctUSGE, fgm, fga, fgmPerGame, fgaPerGame, pctFG, ortgE, ortg, removeOFF_RATING, drtgE, drtg, removeDEF_RATING, netrtgE, netrtg, removeNET_RATING, ratioASTtoTO, ratioAST, paceE, pace, pacePer40PACE_PER40, removePACE, ratioPIE)
+
+adv_stats2.2022 <- adv_stats1.2022 %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, possessions, pctAST, pctOREB, pctDREB, pctTREB, pctTOVTeam, pctTOVE, pctEFG, pctTS, pctUSG, pctUSGE, fgm, fga, fgmPerGame, fgaPerGame, pctFG, ortgE, ortg, removeOFF_RATING, drtgE, drtg, removeDEF_RATING, netrtgE, netrtg, removeNET_RATING, ratioASTtoTO, ratioAST, paceE, pace, pacePer40PACE_PER40, removePACE, ratioPIE)
+
+adv_stats2.2021 <- adv_stats1.2021 %>%
+  select(yearSeason, namePlayer, agePlayer, gp, slugTeam, idPlayer, idTeam, minutes, possessions, pctAST, pctOREB, pctDREB, pctTREB, pctTOVTeam, pctTOVE, pctEFG, pctTS, pctUSG, pctUSGE, fgm, fga, fgmPerGame, fgaPerGame, pctFG, ortgE, ortg, removeOFF_RATING, drtgE, drtg, removeDEF_RATING, netrtgE, netrtg, removeNET_RATING, ratioASTtoTO, ratioAST, paceE, pace, pacePer40PACE_PER40, removePACE, ratioPIE)
+```
+
+```{r}
+raptor_contract_stats <- merge(contract_stats1, raptor_stats, by.x = "Player", by.y = "player_name", all.x = FALSE, all.y = FALSE)
+
+raptor_contract_stats2022 <- merge(contract_stats2023.2, raptor_stats2022, by.x = "Player", by.y = "player_name", all.x = FALSE, all.y = FALSE)
+
+raptor_contract_stats2021 <- merge(contract_stats2022.2, raptor_stats2021, by.x = "Player", by.y = "player_name", all.x = FALSE, all.y = FALSE)
+
+```
+
+
+
+```{r}
+total_stats <- trad_stats2 %>%
+  left_join(def_stats1, by = "idPlayer") %>%
+  left_join(adv_stats2, by = "idPlayer") %>%
+  left_join(trad_stats2, by = "idPlayer")
+
+total_stats2022 <- trad_stats2.2022 %>%
+  left_join(def_stats1.2022, by = "idPlayer") %>%
+  left_join(adv_stats2.2022, by = "idPlayer") %>%
+  left_join(trad_stats2.2022, by = "idPlayer")
+
+total_stats2021 <- trad_stats2.2021 %>%
+  left_join(def_stats1.2021, by = "idPlayer") %>%
+  left_join(adv_stats2.2021, by = "idPlayer") %>%
+  left_join(trad_stats2.2021, by = "idPlayer")
+```
+
+```{r}
+total_stats2 <- rbind(total_stats, total_stats2021, total_stats2022)
+```
+
+```{r}
+raptor_contract_stats <- raptor_contract_stats %>% 
+  select(-c(Team)) %>%
+  rename(Salary = Year_2324) 
+
+raptor_contract_stats2022 <- raptor_contract_stats2022 %>%
+  rename(Salary = Year_2223)
+
+raptor_contract_stats2021 <- raptor_contract_stats2021 %>%
+  rename(Salary = Year_2122)
+
+```
+
+
+```{r}
+raptor_contract_stats2 <- rbind(raptor_contract_stats, 
+                                     raptor_contract_stats2022, 
+                                     raptor_contract_stats2021)
+```
+
+
+
+
+```{r}
+total_stats1 <- total_stats2 %>%
+  select(-c(namePlayer.y, namePlayer.x.x, namePlayer.y.y, agePlayer.y, agePlayer.x.x, agePlayer.y.y, gp.y, gp.x.x, gp.y.y, slugTeam.y, slugTeam.x.x, slugTeam.y.y, idTeam.x, idTeam.y, idTeam))
+```
+
+
+```{r}
+perf_contract_stats2 <- merge(raptor_contract_stats2, total_stats1, 
+                              by.x = c("Player", "season"), 
+                              by.y = c("namePlayer.x", "yearSeason.x"), 
+                              all.x = FALSE, all.y = FALSE)
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+perf_contract_stats3 <- perf_contract_stats2 %>%
+  select(-c(removeOFF_RATING, removeDEF_RATING, removeNET_RATING, season, slugTeam.x, fgm.x, fgm, fga.x, fga, ftm.y, fta.y, oreb.y, dreb.y, ast.y, tov.y, dd2.y, td3.y, plusminus.y, pts.y, pfd.y, blka.y, pf.y, blk.y, stl.y, pctFG2.y, treb.y, fg2m.y, fg2a.y, pctFT.y, pctFG3.y, fg3m.y, fg3a.y, minutes.y, poss, pctFG.x, pctFG.y))
+```
+
+```{r}
+perf_contract_stats4 <- perf_contract_stats3 %>%
+  filter(mp >= 500 | minutes.x >= 11.0) %>%
+  filter(Player!= "Rudy Gay")
+```
+
+```{r}
+set.seed(11111)
+sample <- sample.split(perf_contract_stats4$Salary, SplitRatio = 0.7)
+nba_train  <- subset(perf_contract_stats4, sample == TRUE)
+nba_test   <- subset(perf_contract_stats4, sample == FALSE)
+dim(nba_train)
+dim(nba_test)
+head(nba_train)
+
+
+```
+
+
+
+
+```{r}
+
+nba_regression_train <- nba_train  %>%
+  select(c(,2,4:13,15,18:36,38:40,43:47,49:59,63:76,79))
+nba_regression_test <- nba_test  %>%
+  select(-c(Player, mp, agePlayer.x, idPlayer, idPlayerTeam, minutes.x))
+
+NBAfit1 <- lm(Salary ~ ., data = nba_regression_train)
+summary(NBAfit1)
+```
+
+```{r}
+dtrain <- xgb.DMatrix(data = as.matrix(nba_train[,c(4:13,15,18:36,38:40,43:47,49:59,63:76,79)]), label = as.numeric(nba_train$Salary))
+
+# Create test matrix
+
+
+
+dtest <-  xgb.DMatrix(data = as.matrix(nba_test[,c(4:13,15,18:36,38:40,43:47,49:59,63:76,79)]), label = as.numeric(nba_test$Salary))
+```
+
+```{r}
+set.seed(111111)
+bst_1 <- xgboost(data = dtrain, # Set training data
+               
+               nrounds = 100, # Set number of rounds
+               
+               verbose = 1, # 1 - Prints out fit
+                print_every_n = 20) # Prints out result every 20th iteration
+```
+
+```{r}
+set.seed(111111)
+bst <- xgb.cv(data = dtrain, # Set training data
+              
+              nfold = 5, # Use 5 fold cross-validation
+               
+               eta = 0.1, # Set learning rate
+              
+               nrounds = 1000, # Set number of rounds
+               early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+               
+               verbose = 1, # 1 - Prints out fit
+               nthread = 1, # Set number of parallel threads
+               print_every_n = 20) # Prints out result every 20th iteration
+```
+
+From this we see 37 was the optimal number of iterations for our model. We use this number solely to ensure that we are doing a sufficient amount of rounds for our next tuning stages. We will set the number of iterations to 100 and include an early stop parameter of 20 for our next round of tuning.
+
+```{r}
+max_depth_vals <- c(3, 5, 7, 10, 15) # Create vector of max depth values
+min_child_weight <- c(1,3,5,7, 10, 15) # Create vector of min child values
+
+# Expand grid of parameter values
+cv_params <- expand.grid(max_depth_vals, min_child_weight)
+names(cv_params) <- c("max_depth", "min_child_weight")
+# Create results vector
+rmse_vec  <- rep(NA, nrow(cv_params)) 
+# Loop through results
+for(i in 1:nrow(cv_params)){
+  set.seed(111111)
+  bst_tune <- xgb.cv(data = dtrain, # Set training data
+                     
+                     nfold = 5, # Use 5 fold cross-validation
+                     
+                     eta = 0.1, # Set learning rate
+                     max.depth = cv_params$max_depth[i], # Set max depth
+                     min_child_weight = cv_params$min_child_weight[i], # Set minimum number of samples in node to split
+                     
+                     
+                     nrounds = 1000, # Set number of rounds
+                     early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                     
+                     verbose = 1, # 1 - Prints out fit
+                     nthread = 1, # Set number of parallel threads
+                     print_every_n = 20 # Prints out result every 20th iteration
+                     
+  ) # Set evaluation metric to use
+  
+  rmse_vec[i] <- bst_tune$evaluation_log$test_rmse_mean[bst_tune$best_ntreelimit]
+  
+  
+}
+```
+Best is 65:
+
+```{r}
+# Join results in dataset
+res_db <- cbind.data.frame(cv_params, rmse_vec)
+names(res_db)[3] <- c("rmse") 
+res_db$max_depth <- as.factor(res_db$max_depth) # Convert tree number to factor for plotting
+res_db$min_child_weight <- as.factor(res_db$min_child_weight) # Convert node size to factor for plotting
+# Print AUC heatmap
+g_2 <- ggplot(res_db, aes(y = max_depth, x = min_child_weight, fill = rmse)) + # set aesthetics
+  geom_tile() + # Use geom_tile for heatmap
+  theme_bw() + # Set theme
+  scale_fill_gradient2(low = "blue", # Choose low color
+                       mid = "white", # Choose mid color
+                       high = "red", # Choose high color
+                       midpoint =mean(res_db$rmse), # Choose mid point
+                       space = "Lab", 
+                       na.value ="grey", # Choose NA value
+                       guide = "colourbar", # Set color bar
+                       aesthetics = "fill") + # Select aesthetics to apply
+  labs(x = "Minimum Child Weight", y = "Max Depth", fill = "RMSE") # Set labels
+g_2 # Generate plot
+```
+
+```{r}
+res_db[which.min(res_db$rmse),] 
+```
+
+```{r}
+gamma_vals <- c(0, 0.05, 0.1, 0.15, 0.2) # Create vector of gamma values
+
+# Be Careful - This can take a very long time to run
+set.seed(111111)
+rmse_vec  <- rep(NA, length(gamma_vals))
+for(i in 1:length(gamma_vals)){
+  bst_tune <- xgb.cv(data = dtrain, # Set training data
+                     
+                     nfold = 5, # Use 5 fold cross-validation
+                     
+                     eta = 0.1, # Set learning rate
+                     max.depth = 5, # Set max depth
+                     min_child_weight = 15, # Set minimum number of samples in node to split
+                     gamma = gamma_vals[i], # Set minimum loss reduction for split
+                     
+                     
+                     
+                     nrounds = 1000, # Set number of rounds
+                     early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                     
+                     verbose = 1, # 1 - Prints out fit
+                     nthread = 1, # Set number of parallel threads
+                     print_every_n = 20 # Prints out result every 20th iteration
+  ) # Set evaluation metric to use
+  
+  
+  rmse_vec[i] <- bst_tune$evaluation_log$test_rmse_mean[bst_tune$best_ntreelimit]
+  
+  
+}
+```
+best 59
+
+
+```{r}
+cbind.data.frame(gamma_vals, rmse_vec)
+```
+
+```{r}
+###### 3 - Subsample and Column sample Tuning ######
+
+# Be Careful - This can take a very long time to run
+subsample <- c(0.6, 0.7, 0.8, 0.9, 1) # Create vector of subsample values
+colsample_by_tree <- c(0.6, 0.7, 0.8, 0.9, 1) # Create vector of col sample values
+
+# Expand grid of tuning parameters
+cv_params <- expand.grid(subsample, colsample_by_tree)
+names(cv_params) <- c("subsample", "colsample_by_tree")
+# Create vectors to store results
+rmse_vec <- rep(NA, nrow(cv_params)) 
+# Loop through parameter values
+for(i in 1:nrow(cv_params)){
+  set.seed(111111)
+  bst_tune <- xgb.cv(data = dtrain, # Set training data
+                     
+                     nfold = 5, # Use 5 fold cross-validation
+                     
+                     eta = 0.1, # Set learning rate
+                     max.depth = 5, # Set max depth
+                     min_child_weight = 15, # Set minimum number of samples in node to split
+                     gamma = 0.15, # Set minimum loss reduction for split
+                     subsample = cv_params$subsample[i], # Set proportion of training data to use in tree
+                     colsample_bytree = cv_params$colsample_by_tree[i], # Set number of variables to use in each tree
+                     
+                     nrounds = 1000, # Set number of rounds
+                     early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                     
+                     verbose = 1, # 1 - Prints out fit
+                     nthread = 1, # Set number of parallel threads
+                     print_every_n = 20 # Prints out result every 20th iteration
+  ) # Set evaluation metric to use
+  
+  
+  rmse_vec[i] <- bst_tune$evaluation_log$test_rmse_mean[bst_tune$best_ntreelimit]
+  
+  
+}
+```
+
+74
+
+```{r}
+res_db <- cbind.data.frame(cv_params, rmse_vec)
+names(res_db)[3] <- c("rmse") 
+res_db$subsample <- as.factor(res_db$subsample) # Convert tree number to factor for plotting
+res_db$colsample_by_tree <- as.factor(res_db$colsample_by_tree) # Convert node size to factor for plotting
+g_4 <- ggplot(res_db, aes(y = colsample_by_tree, x = subsample, fill = rmse)) + # set aesthetics
+  geom_tile() + # Use geom_tile for heatmap
+  theme_bw() + # Set theme
+  scale_fill_gradient2(low = "blue", # Choose low color
+                       mid = "white", # Choose mid color
+                       high = "red", # Choose high color
+                       midpoint =mean(res_db$rmse), # Choose mid point
+                       space = "Lab", 
+                       na.value ="grey", # Choose NA value
+                       guide = "colourbar", # Set color bar
+                       aesthetics = "fill") + # Select aesthetics to apply
+  labs(x = "Subsample", y = "Column Sample by Tree", fill = "RMSE") # Set labels
+g_4 # Generate plot
+```
+
+
+```{r}
+res_db
+```
+
+
+```{r}
+res_db[which.min(res_db$rmse),]
+```
+
+```{r}
+###### 4 - eta tuning ######
+
+# Use xgb.cv to run cross-validation inside xgboost
+set.seed(111111)
+bst_mod_1 <- xgb.cv(data = dtrain, # Set training data
+                    
+                    nfold = 5, # Use 5 fold cross-validation
+                    
+                    eta = 0.3, # Set learning rate
+                    max.depth = 5, # Set max depth
+                    min_child_weight = 15, # Set minimum number of samples in node to split
+                    gamma = .15, # Set minimum loss reduction for split
+                    subsample = 1, # Set proportion of training data to use in tree
+                    colsample_bytree =  .9, # Set number of variables to use in each tree
+                    
+                    nrounds = 1000, # Set number of rounds
+                    early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                    
+                    verbose = 1, # 1 - Prints out fit
+                    nthread = 1, # Set number of parallel threads
+                    print_every_n = 20 # Prints out result every 20th iteration
+) # Set evaluation metric to use
+```
+
+
+```{r}
+set.seed(111111)
+bst_mod_2 <- xgb.cv(data = dtrain, # Set training data
+                    
+                    nfold = 5, # Use 5 fold cross-validation
+                    
+                    eta = 0.1, # Set learning rate
+                    max.depth =  5, # Set max depth
+                    min_child_weight = 15, # Set minimum number of samples in node to split
+                    gamma = .15, # Set minimum loss reduction for split
+                    subsample = 1, # Set proportion of training data to use in tree
+                    colsample_bytree = .9, # Set number of variables to use in each tree
+                    
+                    nrounds = 1000, # Set number of rounds
+                    early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                    
+                    verbose = 1, # 1 - Prints out fit
+                    nthread = 1, # Set number of parallel threads
+                    print_every_n = 20 # Prints out result every 20th iteration
+) # Set evaluation metric to use
+```
+
+
+```{r}
+set.seed(111111)
+bst_mod_3 <- xgb.cv(data = dtrain, # Set training data
+                    
+                    nfold = 5, # Use 5 fold cross-validation
+                    
+                    eta = 0.05, # Set learning rate
+                    max.depth = 5, # Set max depth
+                    min_child_weight = 15, # Set minimum number of samples in node to split
+                    gamma = .15, # Set minimum loss reduction for split
+                    subsample = 1 , # Set proportion of training data to use in tree
+                    colsample_bytree =  .9, # Set number of variables to use in each tree
+                    
+                    nrounds = 1000, # Set number of rounds
+                    early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                    
+                    verbose = 1, # 1 - Prints out fit
+                    nthread = 1, # Set number of parallel threads
+                    print_every_n = 20 # Prints out result every 20th iteration
+) # Set evaluation metric to use
+```
+
+
+
+```{r}
+set.seed(111111)
+bst_mod_4 <- xgb.cv(data = dtrain, # Set training data
+                    
+                    nfold = 5, # Use 5 fold cross-validation
+                    
+                    eta = 0.01, # Set learning rate
+                    max.depth = 5, # Set max depth
+                    min_child_weight = 15, # Set minimum number of samples in node to split
+                    gamma = 0.15, # Set minimum loss reduction for split
+                    subsample = 1 , # Set proportion of training data to use in tree
+                    colsample_bytree = .9, # Set number of variables to use in each tree
+                    
+                    nrounds = 1000, # Set number of rounds
+                    early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                    
+                    verbose = 1, # 1 - Prints out fit
+                    nthread = 1, # Set number of parallel threads
+                    print_every_n = 20 # Prints out result every 20th iteration
+) # Set evaluation metric to use
+```
+
+
+
+```{r}
+set.seed(111111)
+bst_mod_5 <- xgb.cv(data = dtrain, # Set training data
+                    
+                    nfold = 5, # Use 5 fold cross-validation
+                    
+                    eta = 0.005, # Set learning rate
+                    max.depth = 5, # Set max depth
+                    min_child_weight = 15, # Set minimum number of samples in node to split
+                    gamma = .15, # Set minimum loss reduction for split
+                    subsample = 1 , # Set proportion of training data to use in tree
+                    colsample_bytree = .9, # Set number of variables to use in each tree
+                    
+                    nrounds = 1000, # Set number of rounds
+                    early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                    
+                    verbose = 1, # 1 - Prints out fit
+                    nthread = 1, # Set number of parallel threads
+                    print_every_n = 20 # Prints out result every 20th iteration
+                    
+) # Set evaluation metric to use
+```
+
+```{r}
+# Extract results for model with eta = 0.3
+pd1 <- cbind.data.frame(bst_mod_1$evaluation_log[,c("iter", "test_rmse_mean")], rep(0.3, nrow(bst_mod_1$evaluation_log)))
+names(pd1)[3] <- "eta"
+# Extract results for model with eta = 0.1
+pd2 <- cbind.data.frame(bst_mod_2$evaluation_log[,c("iter", "test_rmse_mean")], rep(0.1, nrow(bst_mod_2$evaluation_log)))
+names(pd2)[3] <- "eta"
+# Extract results for model with eta = 0.05
+pd3 <- cbind.data.frame(bst_mod_3$evaluation_log[,c("iter", "test_rmse_mean")], rep(0.05, nrow(bst_mod_3$evaluation_log)))
+names(pd3)[3] <- "eta"
+# Extract results for model with eta = 0.01
+pd4 <- cbind.data.frame(bst_mod_4$evaluation_log[,c("iter", "test_rmse_mean")], rep(0.01, nrow(bst_mod_4$evaluation_log)))
+names(pd4)[3] <- "eta"
+# Extract results for model with eta = 0.005
+pd5 <- cbind.data.frame(bst_mod_5$evaluation_log[,c("iter", "test_rmse_mean")], rep(0.005, nrow(bst_mod_5$evaluation_log)))
+names(pd5)[3] <- "eta"
+# Join datasets
+plot_data <- rbind.data.frame(pd1, pd2, pd3, pd4, pd5)
+# Converty ETA to factor
+plot_data$eta <- as.factor(plot_data$eta)
+# Plot points
+g_6 <- ggplot(plot_data, aes(x = iter, y = test_rmse_mean, color = eta))+
+  geom_point(alpha = 0.5) +
+  theme_bw() + # Set theme
+  theme(panel.grid.major = element_blank(), # Remove grid
+        panel.grid.minor = element_blank(), # Remove grid
+        panel.border = element_blank(), # Remove grid
+        panel.background = element_blank()) + # Remove grid 
+  labs(x = "Number of Trees", title = "RMSE v Number of Trees",
+       y = "RMSE", color = "Learning \n Rate")  # Set labels
+g_6
+```
+
+
+```{r}
+set.seed(111111)
+bst_final <- xgboost(data = dtrain, # Set training data
+                     
+                     
+                     
+                     eta = .1, # Set learning rate
+                     max.depth =  5, # Set max depth
+                     min_child_weight = 15, # Set minimum number of samples in node to split
+                     gamma = .15, # Set minimum loss reduction for split
+                     subsample = 1, # Set proportion of training data to use in tree
+                     colsample_bytree = .9, # Set number of variables to use in each tree
+                     
+                     nrounds = 1000, # Set number of rounds
+                     early_stopping_rounds = 50, # Set number of rounds to stop at if there is no improvement
+                     
+                     verbose = 1, # 1 - Prints out fit
+                     nthread = 1, # Set number of parallel threads
+                     print_every_n = 20 # Prints out result every 20th iteration
+                     
+) # Set evaluation metric to use
+```
+
+```{r}
+# Extract importance
+imp_mat <- xgb.importance(model = bst_final)
+# Plot importance (top 10 variables)
+xgb.plot.importance(imp_mat, top_n = 10)
+```
+
+
+```{r}
+getTreeBreakdown = function(tree, col_names){
+
+  ####accepts a tree (data table), and column names
+  ####outputs a data table, of the impact of each variable + intercept, for each leaf
+
+  tree_breakdown <- vector("list", length(col_names)  + 2)
+  names(tree_breakdown) = c(col_names,'intercept','leaf')
+
+  leaves = tree[leaf==T, Node]
+
+  for (leaf in leaves){
+
+    leaf_breakdown = getLeafBreakdown(tree,leaf,col_names)
+    leaf_breakdown$leaf = leaf
+    tree_breakdown = rbindlist(append(list(tree_breakdown),list(leaf_breakdown)))
+  }
+
+  return (tree_breakdown)
+}
+
+buildExplainerFromTreeList = function(tree_list,col_names){
+ 
+  ####accepts a list of trees and column names
+  ####outputs a data table, of the impact of each variable + intercept, for each leaf
+
+  tree_list_breakdown <- vector("list", length(col_names)  + 3)
+  names(tree_list_breakdown) = c(col_names,'intercept', 'leaf','tree')
+
+  num_trees = length(tree_list)
+ 
+  cat('\n\nGetting breakdown for each leaf of each tree...\n')
+  pb <- txtProgressBar(style=3)
+ 
+  for (x in 1:num_trees){
+    tree = tree_list[[x]]
+    tree_breakdown = getTreeBreakdown(tree, col_names)
+    tree_breakdown$tree = x - 1
+    tree_list_breakdown = rbindlist(append(list(tree_list_breakdown),list(tree_breakdown)))
+    setTxtProgressBar(pb, x / num_trees)
+  }
+ 
+  return (tree_list_breakdown)
+ 
+}
+
+
+getStatsForTrees = function(trees, nodes.train, type = "binary", base_score = 0.5){
+  #Accepts data table of tree (the output of xgb.model.dt.tree)
+  #Returns a list of tree, with the stats filled in
+ 
+  tree_list = copy(trees)
+  tree_list[,leaf := Feature == 'Leaf']
+  tree_list[,H:=Cover]
+ 
+  non.leaves = which(tree_list[,leaf]==F)
+
+ 
+  # The default cover (H) seems to lose precision so this loop recalculates it for each node of each tree
+  cat('\n\nRecalculating the cover for each non-leaf... \n')
+  pb <- txtProgressBar(style=3)
+  j = 0
+  for (i in rev(non.leaves)){
+    left = tree_list[i,Yes]
+    right = tree_list[i,No]
+    tree_list[i,H:=tree_list[ID==left,H] + tree_list[ID==right,H]]
+    j=j+1
+    setTxtProgressBar(pb, j / length(non.leaves))
+  }
+ 
+
+  if (type == 'regression'){
+    base_weight = base_score
+  } else{
+    base_weight = log(base_score / (1-base_score))
+  }
+ 
+  tree_list[leaf==T,weight:=base_weight + Quality]
+ 
+  tree_list[,previous_weight:=base_weight]
+  tree_list[1,previous_weight:=0]
+ 
+  tree_list[leaf==T,G:=-weight*H]
+ 
+  tree_list = split(tree_list,as.factor(tree_list$Tree))
+  num_tree_list = length(tree_list)
+  treenums =  as.character(0:(num_tree_list-1))
+  t = 0
+  cat('\n\nFinding the stats for the xgboost trees...\n')
+  pb <- txtProgressBar(style=3)
+  for (tree in tree_list){
+    t=t+1
+    num_nodes = nrow(tree)
+    non_leaf_rows = rev(which(tree[,leaf]==F))
+    for (r in non_leaf_rows){
+        left = tree[r,Yes]
+        right = tree[r,No]
+        leftG = tree[ID==left,G]
+        rightG = tree[ID==right,G]
+       
+        tree[r,G:=leftG+rightG]
+        w=tree[r,-G/H]
+       
+        tree[r,weight:=w]
+        tree[ID==left,previous_weight:=w]
+        tree[ID==right,previous_weight:=w]
+    }
+   
+    tree[,uplift_weight:=weight-previous_weight]
+    setTxtProgressBar(pb, t / num_tree_list)
+  }
+ 
+  return (tree_list)
+}
+
+
+getLeafBreakdown = function(tree,leaf,col_names){
+ 
+  ####accepts a tree, the leaf id to breakdown and column names
+  ####outputs a list of the impact of each variable + intercept
+ 
+  impacts = as.list(rep(0,length(col_names)))
+  names(impacts) = col_names
+ 
+  path = findPath(tree,leaf)
+  reduced_tree = tree[Node %in% path,.(Feature,uplift_weight)]
+ 
+  impacts$intercept=reduced_tree[1,uplift_weight]
+  reduced_tree[,uplift_weight:=shift(uplift_weight,type='lead')]
+ 
+  tmp = reduced_tree[,.(sum=sum(uplift_weight)),by=Feature]
+  tmp = tmp[-nrow(tmp)]
+  impacts[tmp[,Feature]]=tmp[,sum]
+ 
+  return (impacts)
+}
+
+findPath = function(tree, currentnode, path = c()){
+ 
+  #accepts a tree data table, and the node to reach
+  #path is used in the recursive function - do not set this
+ 
+  while(currentnode>0){
+    path = c(path,currentnode)
+    currentlabel = tree[Node==currentnode,ID]
+    currentnode = c(tree[Yes==currentlabel,Node],tree[No==currentlabel,Node])
+  }
+  return (sort(c(path,0)))
+ 
+}
+
+
+findLeaves = function(tree, currentnode){
+ 
+  if (tree[currentnode,'Feature']=='Leaf'){
+    leaves = currentnode
+  }else{
+    leftnode = tree[currentnode,Yes]
+    rightnode = tree[currentnode,No]
+    leaves = c(findLeaves(tree,'leftnode',with=FALSE),findLeaves(tree,'rightnode',with=FALSE))
+  }
+ 
+  return (sort(leaves))
+ 
+ 
+}
+
+
+
+buildExplainer = function(xgb.model,
+                          trainingData,
+                       
+                          type = "binary", base_score = 0.5, trees_idx = NULL){
+
+  col_names = colnames(trainingData)
+  cat('\nCreating the trees of the xgboost model...')
+  trees = xgb.model.dt.tree(col_names, model = xgb.model, trees = trees_idx)
+  cat('\nGetting the leaf nodes for the training set observations...')
+  nodes.train = predict(xgb.model,trainingData,predleaf =TRUE)
+
+  cat('\nBuilding the Explainer...')
+  cat('\nSTEP 1 of 2')
+  tree_list = getStatsForTrees(trees, nodes.train, type = type, base_score = base_score)
+  cat('\n\nSTEP 2 of 2')
+  explainer = buildExplainerFromTreeList(tree_list,col_names)
+
+  cat('\n\nDONE!\n\n')
+
+  return (explainer)
+}
+```
+
+
+```{r}
+explainer = buildExplainer(bst_final, dtrain, type="regression", base_score = 0.5, trees_idx = NULL) # Create explainer
+```
+```{r}
+pred.breakdown = explainPredictions(bst_final, explainer, dtest) # Breakdown predictions
+```
+```{r}
+showWaterfall(bst_final, explainer, dtest, as.matrix(nba_test[, c(4:13,15,18:36,38:40,43:47,49:59,63:76,79)]) ,17, type = "regression", threshold = 0.07)
+```
+
+```{r}
+showWaterfall(bst_final, explainer, dtest, as.matrix(nba_test[, c(4:13,15,18:36,38:40,43:47,49:59,63:76,79)]) ,1:320, type = "regression", threshold = 0.07)
+```
+
+```{r}
+# Your list of numeric values
+numeric_values <- c(12394842, 26389133, 4809681, 1968142, 3153289, 2574343, 4473854, 13344209, 12022495, 8697587, 5385535, 9132893, 2643794, 18146009, 19503189, 17499281, 25068148, 35068764, 1654104, 29693503, 25776518, 5281141, 8480506, 2823208, 1316790, 7918682, 15954207, 5737535, 6713957, 3956784, 26172549, 32325855, 2589885, 8570238, 2470789, 2337673, 4847188, 22465804, 7319594, 14970728, 9498397, 3924869, 10195729, 15946961, 2935773, 6373993, 2237248, 17673882, 16974615, 23110320, 2780159, 2218229, 2300343, 8112279, 2324374, 22685200, 1462173, 1281117, 1960841, 33286413, 3277232, 3563500, 8736373, 3900878, 3351822, 10654030, 6428651, 2626891, 2302513, 13149454, 790304.3, 19322281, 11999399, 2809966, 4497408, 2786286, 24637977, 6636769, 21183629, 8484697, 4348073, 6818104, 28320150, 1977159, 14691154, 30638072, 29402169, 10050240, 10095277, 5798364, 23015217, 8025851, 5444936, 8073911, 3110212, 3917449, 9197349, 2890923, 16291403, 13215913, 8003200, 6138044, 5588242, 2842667, 21066206, 29030935, 5099648, 1817275, 7936906, 6366736, 4462639, 1767353, 4013568, 8497507, 37129055, 1189962, 3587191, 9798342, 6187532, 20029822, 2928802, 10790659, 2364216, 11312467, 5518495, 3271646, 2729159, 2979906, 6875327, 5014174, 30572931, 32615690, 40472427, 11867842, 4294632, 10610701, 7997381, 2805326, 15321822, 37634723, 8692627, 4323885, 5231036, 29477533, 4724995, 15551446, 1174692, 3887049, 4920798, 24840585, 358550.5, 3081961, 38154444, 21793022, 24974405, 6177632, 13584330, 29475961, 22042939, 18635287, 3642220, 31525803, 3331769, 2923786, 18758902, 6377529, 15962187, 24247623, 2634579, 5769064, 1871452, 8971130, 11543152, 3553198, 9117438, 5094474, 26296871, 29403993, 37791482, 10158715, 20341758, 6976280, 23143458, 5911429, 3210367, 3177828, 4190925, 9664301, 14921985, 2454188, 13236175, 4449457, 3715187, 26307451, 23096012, 15558442, 2683063, 20642856, 1795605, 30492826, 8272624, 10760295, 19160944, 24758419, 12974997, 1935023, 2971758, 16932849, 22252762, 24759016, 6319037, 16431534, 32667635, 35495923, 34713801, 2785106, 16012075, 4277784, 3447960, 6787114, 8453769, 2436092, 25901698, 3239970, 17658737, 4368740, 3060924, 7197731, 4594371, 10904461, 10559880, 6477389, 16442231, 9789165, 4324619, 5802483, 4703554, 17083783, 2267208, 4278404, 7096112, 21024816, 4553128, 3777124, 1436410, 4899611, 8545908, 13134699, 6699017, 39240213, 16606777, 12629594, 296198.6, 4330164, 2434416, 19554300, 7281639, 2501496, 5505584, 494010.3, 12309404, 27337880, 3540053, 2714316, 5839538, 2644984, 5956612, 8940880, 5000231, 21915476, 23049477, 11496037, 8735182, 5398608, 6443326, 2381921, 31378357, 6785018, 35914831, 17481255, 15241308, 12852050, 18862846, 12706615, 6278839, 7844457, 12561486, 4946580, 5931908, 32219384, 30214861, 35650257, 2798357, 2881157, 7250820, 3091717, 5903999, 21859843, 4334792, 5403896, 9010318, 2562221, 6141350, 318735.5, 3699506, 1118011, 25933457, 4015015, 5427247, 16115693, 1147858, 6653079, 7857617, 9390475, 15020555, 1687969, -353389.2, 10377208, 5773326, 7386063)
+
+
+
+# Create a data frame with a column named 'values'
+nba_test$prediction <- data.frame(prediction = numeric_values)
+
+nba_test$prediction
+
+```
+
+
+```{r}
+pred.breakdown = explainPredictions(bst_final, explainer, dtrain) # Breakdown predictions
+```
+
+```{r}
+showWaterfall(bst_final, explainer, dtrain, as.matrix(nba_train[, c(4:13,15,18:36,38:40,43:47,49:59,63:76,79)]) ,1:746, type = "regression", threshold = 0.07)
+```
+
+```{r}
+# Your list of numeric values
+numeric_values <- c(16412179, 3636828, 5631334, 1562610, 1827643, 2001409, 880005.5, 10329450, 9999308, 10016564, 10489078, 3113676, 3255178, 8574998, 9026649, 3905836, 3373870, 3539777, 3390260, 3663536, 2402352, 3199013, 3356075, 2643356, 2909258, 2132601, 31576691, 3941648, 22321400, 35362418, 37977962, 40600887, 10254290, 1995524, 137878.4, 1747045, 62637.3, 12014781, 2409813, 2907451, 2639733, 1565088, 6482031, 28101729, 32998495, 6916332, 1517763, 4998620, 32374236, 2906555, 10846948, 11714032, 18000829, 18004021, 18699346, 18699213, 19994800, 2201245, 46738793, 4345030, 12495609, 29469691, 31647374, 33835511, 200696.3, 467638.1, 13299282, 13903812, 24997251, 4732311, 6473781, 21990206, 4501712, 21180231, 19277524, 1997073, 857016.6, 6481494, 6800447, 4673021, 5952799, 2172852, 2138973, 2241956, 4434239, 25679958, 83111.74, 8519529, 17504000, 15387563, 2641032, 8132585, 4227659, 2599671, 1914497, 2022272, 12689031, 11749615, 3941438, 4127922, 30799300, 13667841, 14318773, 2713553, 5269079, 30863879, 33333906, 35791694, 17602408, 18207739, 20614466, 5839198, 7420733, 11093366, 6998641, 7555854, 2392075, 742829.7, 2019632, 3446902, 3610476, 5575667, 16699612, 17327249, 3553808, 3719864, 7305265, 5158997, 2018675, 30013478, 31374831, 17305143, 2024125, 173833.1, 2313948, 42488555, 45637006, 2135300, 2528537, 1778996, 1929745, 12393593, 8278196, 8691941, 9102630, 20477619, 19478003, 10004347, 201307.3, 8508618, 2025676, 7043293, 8921198, 34002160, 4645316, 4834192, 5065569, 15998075, 2111137, 2216422, 28101751, 30349977, 32598721, 7779154, 9836528, 8805986, 8248256, 12638957, 30906692, 10723213, 2030768, 15432221, 18217059, 8527378, 7803524, 25996363, 27299240, 28607700, 2041543, 4689243, 6270789, 12407834, 1005837, 9715604, 10348137, 5378294, 13449024, 14516649, 3194908, 15679219, 17139861, 18358613, 2033927, 2130608, 3844954, 31648048, 36019691, 4237209, 4436940, 5887593, 12099550, 5254621, 8277988, 1784438, 266774.8, 11400053, 22626140, 30603181, 28104757, 30908787, 33161713, 4678016, 4504488, 10900872, 4001382, 13745489, 13742997, 24025838, 25807893, 2243150, 1969019, 2349489, 2020078, 15649181, 16898491, 11065568, 3997037, 2634952, 2643140, 2326331, 2239983, 1312837, 18221737, 19565750, 3197981, 17145516, 17996506, 18828994, 461182.6, 2997271, 2087111, 2039559, 5258596, 5519810, 21249716, 234087.3, 1669464, 10493471, 1692018, 4905969, 5154715, 1998360, 12999501, 12999394, 8294159, 8715652, 18550792, 5274983, 3994094, 3304515, 8797619, 39350155, 42486963, 3100632, 3521432, 29925367, 30065623, 31489933, 3999402, 2621251, 4308447, 12403449, 4066946, 8935460, 5200948, 5207372, 20284256, 18352418, 2401917, 2207460, 2318712, 6720175, 7043183, 1729214, 8853139, 9245682, 2574289, 2700489, 1840854, 1998933, 1838427, 3430770, 5265861, 1926205, 7519408, 10122217, 10934968, 1169676)
+```
+
+```{r}
+
+numeric_values4 <- c(1714256, 2066285, 2166660, 3899109, 1519444, 7062908, 6505141, 9719198, 2021579, 2125636, 3197563, 3936940, 8748998, 9397531, 19494091, 1805235, 27730620, 26350214, 4331777, 9436130, 9892499, 2923608, 1935641, 4518577, 4671114, 5044928, 6921589, 7250472, 29472175, 33824085, 4567549, 44303576, 33001073, 2644731, 3838858, 8200919, 4057947, 4693429, 19996467, 19996422, 5464293, 1827512, 5349016, 6801273, 2164215, 462734.6, 26760007, 31828879, 1929890, 2001533, 30350315, 32605930, 4495517, 4503471, 9593050, 19998895, 2003621, 1899230, 10501090, 5315930, 1641851, 1927038, 4102979, 6016418, 6189011, 36013823, 37656288, 45182632, 1565663, 7993652, 17354910, 18643153, 6481533, 10997769, 31579039, 33617110, 25339074, 2301337, 2404693, 6803047, 5056281, 14001604, 14701166, 15436734, 17400714, 6011627, 12418658, 13339482, 2007141, 2162772, 2320902, 2802980, 2998709, 2154907, 1568225, 1841822, 2376362, 6585244, 3105476, 4764479, 12957662, 5000698, 4088517, 1971231, 2817912, 11614829, 31172362, 36863373, 1838065, 1701570, 2130864, 3001763, 19797716, 23762899, 28228488, 6009618, 5990198, 2020476, 311212.3, 1797875, 3902341, 4098188, 12002995, 15622923, 16875232, 574939.9, 3045674, 31649290, 33829410, 39343536, 8415406, 1881776, 2351773, 3868149, 20002847, 12197784, 2021736, 5003854, 2002649, 14703892, 2681986, 42020876, 44117628, 47647255, 4256358, 14504386, 15669123, 31253582, 30556104, 3840845, 7998240, 7499711, 6654226, 5570867, 5843303, 7415354, 43223713, 1001037, 2585406, 31647013, 36011435, 9937782, 8776307, 9225028, 28334916, 35332728, 38911665, 37031020, 1901221, 1522124, 2424797, 8233893, 3774523, 9497955, 10248614, 16475411, 47607737, 2026175, 18603690, 1787798, 15277861, 15275843, 10188596, 37095055, 40064346, 513244.1, 2068659, 2416833, 161232.9, 2048645, 2148229, 3873569, 3074947, 21701192, 22490820, 14488315, 15554288, 2025353, 1812688, 9471098, 9942909, 513686.3, 2696914, 17113991, 13841226, 18833673, 2608027, 3914421, 16506563, 16496502, 16998480, 2645292, 2901436, 1291867, 12496328, 9249006, 9082379, 4999232, 2840856, 4380868, 10999635, 3297928, 33386986, 5565420, 20100142, 21631081, 21762860, 20997082, 22679062, 24362218, 3498630, 3501061, 3504284, 1833435, 949467.4, 7562953, 2024470, 8445248, 9132262, 9798437, 2462788, 2020817, 1930342, 3741965, 3912917, 256128.7, 18001994, 35097752, 1519915, 1963053, 2315054, 1782579, 12943619, 2095970, 9390614, 304046.7, 4999138, 5010522, 4691098, 12025488, 19697673, 11711615, 31049012, 47603646)
+
+
+
+```
+
+
+```{r}
+numeric_values6 <- c(
+  2352693, 23998018, 18518560, 16762713, 18006877, 6801552, 1754821, 6100068, 6397551, 1797872, 
+  1702497, 1843364, 2163434, 6300180, 11014699, 33002976, 35447623, 37894013, 5327936, 5734523, 
+  9417458, 14320635, 13794616, 2027365, 737386.5, 7420050, 7772328, 9837281, 6804505, 39345474, 
+  42493426, 45638615, 2655080, 7733543, 307549.6, 2137531, 4040753, 1912709, 2842105, 4382754, 
+  2390540, 7499466, 2089690, 11457063, 10385578, 17795603, 5854521, 6146872, 8623321, 11656545, 
+  5001752, 2907952, 1939174, 2290964, 5627135, 8800604, 9197908, 9499655, 35354072, 40995846, 
+  4913067, 6262619, 47077510, 3834927, 1493938, 2265778, 1930834, 2000543, 2018123, 2204590, 
+  7643636, 3795147, 1785865, 4001587, 6304748, 5495761, 30910484, 33382437, 1849301, 2001691, 
+  4997261, 137853.1, 3051748, 19496430, 20361233, 1367421, 4020287, 3002038, 3117199, 17072750, 
+  17924030, 12597345, 8702266, 4910572, 2906581, 10237350, 3526049, 13322359, 7081082, 1781197, 
+  1932823, 3999257, 4001136, 12493427, 11496923, 17925944, 21485521, 1707285, 14189904, 1725380, 
+  8665296, 1973681, 17899477, 35996240, 37635586, 39253996, 9995829, 2033870, 4875782, 5122643, 
+  2532265, 8328992, 40065634, 1784601, 9893948, 3042775, 1566234, 2010401, 513339.4, 2645002, 
+  3143306, 2502767, 7990483, 12860.6, 3989295, 2404941, 4728209, 2435244, 470914.3, 5722800, 
+  27002030, 270001.4, 4024792, 4217026, 5810154, 2603993, 2725578, 4346416, 2321814, 8375674, 
+  13998202, 2169629, 2584074, 8751251, 9450168, 1563332, 2230226, 2240246, 2832513, 2640121, 
+  1957814, 2907986, 2019000, 4217125, 2334415, 2444716, 1721556, 118038.2, 1540139, 1778598, 
+  1925754, 1765650, 1960141, 2346120, 7351280, 19496626, 37094317, 40067205, 2618578, 4307145, 
+  4593853, 4807325, 10736250, 34003669
+)
+
+```
+
+
+
+```{r}
+
+numeric_values <- c(numeric_values, numeric_values4, numeric_values6)
+
+
+# Create a data frame with a column named 'values'
+nba_train$prediction <- data.frame(prediction = numeric_values)
+
+```
+
+```{r}
+library(dplyr)
+
+nba_train2 <- nba_train %>%
+  group_by(idPlayerTeam, yearSeason.y) %>%
+  summarize(sum(prediction), sum(Salary))
+
+```
+
+```{r}
+nba_test2 <- nba_test %>%
+  group_by(idPlayerTeam,yearSeason.y) %>%
+  summarize(sum(prediction), sum(Salary))
+```
+
+```{r}
+merged_data <- merge(nba_train2, nba_test2, by = c("idPlayerTeam", "yearSeason.y"), all = TRUE)
+merged_data <- merged_data %>%
+  replace(is.na(.),0) %>%
+  mutate(totalpred = `sum(prediction).x` + `sum(prediction).y`,
+         totalsalary = `sum(Salary).x` + `sum(Salary).y`) %>%
+  mutate(value = totalpred - totalsalary)
+```
+
+```{r}
+nbateams <- nba_teams(league = "NBA") %>%
+  select(idTeam, nameTeam)
+```
+
+```{r}
+merged_data2 <- merge(merged_data, nbateams, by.x = "idPlayerTeam", by.y = "idTeam", all = FALSE)
+```
+
+```{r}
+print(nba_test$prediction[166:167,]) 
+```
+
